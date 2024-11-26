@@ -1,0 +1,6 @@
+@NinetySix.Server_HostAddress = http://localhost:5296
+
+GET {{NinetySix.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

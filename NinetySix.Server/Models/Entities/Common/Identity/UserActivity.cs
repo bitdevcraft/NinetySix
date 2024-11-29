@@ -1,9 +1,11 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Entities;
 using NinetySix.Server.Models.Primitives;
 
 namespace NinetySix.Server.Models.Entities.Common.Identity;
 
+[Collection(nameof(UserActivity))]
 public class UserActivity : BaseEntity, IBaseWorkspace
 {
     [BsonId] 

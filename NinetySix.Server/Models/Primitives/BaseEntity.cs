@@ -1,15 +1,13 @@
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using NinetySix.Server.Models.Interfaces;
+using MongoDB.Entities;
+
 
 namespace NinetySix.Server.Models.Primitives;
 
-public class BaseEntity : IEntity
+public class BaseEntity : Entity
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
     
     [BsonRepresentation(BsonType.DateTime)]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

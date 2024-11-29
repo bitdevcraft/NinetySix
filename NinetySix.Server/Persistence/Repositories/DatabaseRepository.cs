@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using MongoDB.Entities;
 using NinetySix.Server.Models.Entities.Common;
 using NinetySix.Server.Models.Interfaces;
 using NinetySix.Server.Models.Metadata;
@@ -11,15 +12,9 @@ public class DatabaseRepository(IMongoDbSettings mongoDbSettings) : IDatabaseRep
 {
     private readonly MongoClient _mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
 
-    public void AddDatabase(string databaseName)
+    public async Task<string> AddDatabase(string databaseName)
     {
-
         
-        var coreDb = _mongoClient.GetDatabase(mongoDbSettings.DatabaseName);
-        var workspaceCollection =  coreDb.GetCollection<Workspace>("Workspaces");
-        var metadataObjColletion =  coreDb.GetCollection<MetadataObject>("Metadataobjects");
-        var metadataObjFieldCollection =  coreDb.GetCollection<MetadataObjectField>("MetadataObjectFields");
-
         var workspace = new Workspace
         {
             DomainName = databaseName,
@@ -27,7 +22,7 @@ public class DatabaseRepository(IMongoDbSettings mongoDbSettings) : IDatabaseRep
             Schema = databaseName
         };
         
-         workspaceCollection.InsertOne(workspace);
+        await workspace.SaveAsync();
          
          var standardCollections = new List<MetadataObject>
          {
@@ -40,18 +35,20 @@ public class DatabaseRepository(IMongoDbSettings mongoDbSettings) : IDatabaseRep
 
          foreach (var stdCollection in standardCollections)
          {
-             stdCollection.WorkspaceId = workspace.Id;
-             metadataObjColletion.InsertOne(stdCollection);
+             stdCollection.WorkspaceId = workspace.ID;
+             await stdCollection.SaveAsync();
 
              foreach (var field in stdCollection.Fields)
              {
-                 field.WorkspaceId = workspace.Id;
-                 field.MetadataObjectId = stdCollection.Id;
-                 metadataObjFieldCollection.InsertOne(field);
+                 field.WorkspaceId = workspace.ID;
+                 field.MetadataObjectId = stdCollection.ID;
+                 await field.SaveAsync();
              }
              
-             db.CreateCollection(stdCollection.ApiName);
+             await db.CreateCollectionAsync(stdCollection.ApiName);
          }
+         
+         return workspace.ID;
     }
 
 

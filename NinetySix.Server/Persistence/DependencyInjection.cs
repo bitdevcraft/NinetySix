@@ -1,6 +1,7 @@
 using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
+using MongoDB.Entities;
 using NinetySix.Server.Models.Entities.Common.Identity;
 using NinetySix.Server.Models.Interfaces;
 using NinetySix.Server.Models.Repositories;
@@ -35,8 +36,15 @@ public static class DependencyInjection
             )
         );
 
+        Task.Run(async () =>
+            {
+                await DB.InitAsync("core",  "localhost"); //initialize db connection
+            })
+            .GetAwaiter()
+            .GetResult();
+
         services.AddSingleton<IDatabaseRepository, DatabaseRepository>();
-        
+
         services.AddScoped<MongoCoreInitialiser>();
 
         return services;

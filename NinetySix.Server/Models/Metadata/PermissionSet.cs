@@ -1,7 +1,9 @@
+using MongoDB.Entities;
 using NinetySix.Server.Models.Primitives;
 
 namespace NinetySix.Server.Models.Metadata;
 
+[Collection(nameof(PermissionSet))]
 public class PermissionSet : BaseEntity
 {
     public string? Name { get; set; }

@@ -1,14 +1,12 @@
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using NinetySix.Server.Models.Primitives;
 
 namespace NinetySix.Server.Models.Entities.Common;
 
-public class Workspace
+public class Workspace : BaseEntity
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; } 
     public string? Name { get; set; }
     public string? ConnectionString { get; set; }
     public string? DomainName { get; set; }

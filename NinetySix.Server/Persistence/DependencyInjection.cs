@@ -2,6 +2,11 @@ using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using NinetySix.Server.Models.Entities.Common.Identity;
+using NinetySix.Server.Models.Interfaces;
+using NinetySix.Server.Models.Repositories;
+using NinetySix.Server.Persistence.Repositories;
+using NinetySix.Server.Persistence.Seed;
+using NinetySix.Server.Persistence.Settings;
 
 
 namespace NinetySix.Server.Persistence;
@@ -14,19 +19,26 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        // services.AddScoped<IMongoDbSettings>(cfg =>
-        //      new MongoDbSettings(configuration.GetConnectionString("MongoDbSettings"), 
-        //         configuration.GetSection("MongoDb").GetValue<string>("DatabaseName"))
-        // );
-
         services
-            .AddIdentityMongoDbProvider<User, Role, ObjectId>(mongo =>
+            .AddIdentityMongoDbProvider<User, ObjectId>(mongo =>
             {
-                mongo.ConnectionString = $"{configuration.GetConnectionString("MongoDbConnection")}/core" ;
+                mongo.ConnectionString = $"{configuration.GetSection("MongoDb")
+                    .GetValue<string>("ConnectionString")}/core";
                 mongo.UsersCollection = "users";
             });
-            // .AddDefaultTokenProviders();
-    
+
+
+        services.AddSingleton<IMongoDbSettings>(cfg =>
+            new MongoDbSettings(
+                configuration.GetSection("MongoDb").GetValue<string>("ConnectionString"),
+                configuration.GetSection("MongoDb").GetValue<string>("DatabaseName")
+            )
+        );
+
+        services.AddSingleton<IDatabaseRepository, DatabaseRepository>();
+        
+        services.AddScoped<MongoCoreInitialiser>();
+
         return services;
     }
 }
